@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.RegularExpressions;
+using static lambda_cs.Parser.Parser;
 
 namespace lambda_cs.Components
 {
@@ -17,7 +18,7 @@ namespace lambda_cs.Components
         {
             var expr = new Lambda('f', new Application(new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x')))),
                                                        new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x'))))));
-            Console.WriteLine(expr.ToString());
+            Console.WriteLine(Parse(expr.ToString()).ToString());
         }
     }
 }
