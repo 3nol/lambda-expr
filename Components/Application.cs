@@ -54,6 +54,7 @@ namespace lambda_cs.Components
 
         public override string ToString()
         {
+            // TODO remove unnecessary Parentheses
             var e1 = this.expr1 is Variable ? this.expr1.ToString() : "(" + this.expr1.ToString() + ")";
             var e2 = this.expr2 is Variable ? this.expr2.ToString() : "(" + this.expr2.ToString() + ")";
             return e1 + " " + e2;

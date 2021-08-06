@@ -15,5 +15,9 @@ namespace lambda_cs.Evaluation
             }
             return newVar;
         }
+
+        // TODO: alpha conversion, substitution
+
+        // TODO folds
     }
 }

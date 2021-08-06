@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using lambda_cs.Components;
-using System.Linq;
 
 namespace lambda_cs.Parser
 {

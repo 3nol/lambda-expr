@@ -55,6 +55,7 @@ namespace lambda_cs.Components
 
         public override string ToString()
         {
+            // TODO merge consecutive Lambdas
             return "\\" + this.var + ". " + this.expr.ToString();
         }
     }
