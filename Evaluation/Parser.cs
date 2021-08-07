@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using lambda_cs.Components;
 
-namespace lambda_cs.Parser
+namespace lambda_cs.Evaluation
 {
     static class Parser
     {

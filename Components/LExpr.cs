@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using static lambda_cs.Parser.Parser;
+using static lambda_cs.Evaluation.Parser;
 
 namespace lambda_cs.Components
 {
