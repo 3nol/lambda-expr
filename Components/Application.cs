@@ -76,8 +76,7 @@ namespace lambda_cs.Components
                 // if a name capture happens, alpha conversion is being done
                 else
                 {
-                    // TODO fix this broken thing
-                    var e = new Application(Substitute(lambda.GetExpr(), lambda.GetVar(), this.expr2), this.expr2);
+                    var e = new Application(Substitute(lambda, lambda.GetVar(), this.expr2), this.expr2);
                     Log("--alpha-> " + e.ToString(), annotate);
                     return e;
                 }

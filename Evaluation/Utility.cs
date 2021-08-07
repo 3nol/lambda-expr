@@ -37,7 +37,7 @@ namespace lambda_cs.Evaluation
             {
                 // nothing to substitute
                 var l = source as Lambda;
-                if (l.GetVar().Equals(target))
+                if (l.GetBoundVars().TrueForAll(item => item.Equals(target)))
                 {
                     return source;
                 }
