@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
@@ -55,60 +54,85 @@ namespace lambda_cs.Components
             return boundVars;
         }
 
-        public override LExpr Reduce(Evaluation eval)
+        // reduces every combination of function application
+        public override LExpr Reduce(Evaluation eval, bool annotate)
         {
+            // first subexpression is a lambda abstraction
             if (this.expr1 is Lambda)
             {
                 var lambda = this.expr1 as Lambda;
+                // eager evaluation reduces the argument before the function
                 if (eval == Evaluation.Eager && IsRedex(this.expr2, eval))
                 {
                     return new Application(lambda, this.expr2.Reduce(eval));
                 }
+                // if a name captures is not present, this lambda abstraction is reduced
                 else if (NameCapture(lambda.GetExpr(), this.expr2).Count == 0)
                 {
-                    var e = Substitute(lambda, lambda.GetVar(), this.expr2);
-                    Console.WriteLine("--beta-> " + e.ToString());
+                    var e = Substitute(lambda.GetExpr(), lambda.GetVar(), this.expr2);
+                    Log("--beta-> " + e.ToString(), annotate);
                     return e;
                 }
+                // if a name capture happens, alpha conversion is being done
                 else
                 {
-                    var e = Substitute(lambda, lambda.GetVar(), this.expr2);
-                    Console.WriteLine("--alpha-> " + e.ToString());
+                    // TODO fix this broken thing
+                    var e = new Application(Substitute(lambda.GetExpr(), lambda.GetVar(), this.expr2), this.expr2);
+                    Log("--alpha-> " + e.ToString(), annotate);
                     return e;
                 }
             }
+            // all cases for application reduction
             else if (this.expr1 is Application)
             {
                 var app = this.expr1 as Application;
+                // first expression is an operator which forces its arguments to strict evaluation
                 if ((app.GetExpr1() is Constant) && (app.GetExpr1() as Constant).GetConstantType() == Constant.Type.Operator)
                 {
+                    // reduce first argument
                     if (IsRedex(app.GetExpr2(), eval))
                     {
                         return new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval)), this.expr2);
                     }
+                    // reduce second argument
                     else if (IsRedex(this.expr2, eval))
                     {
                         return new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval));
                     }
+                    // make delta reduction by evaluating the operator
                     else if (app.GetExpr2() is Constant && this.expr2 is Constant)
                     {
-                        return DeltaReduce(app.GetExpr1() as Constant, app.GetExpr2() as Constant, this.expr2 as Constant);
+                        var e = DeltaReduce(app.GetExpr1() as Constant, app.GetExpr2() as Constant, this.expr2 as Constant);
+                        Log("--delta-> " + e.ToString(), annotate);
+                        return e;
                     }
+                    // if operator has no fitting arguments, nf is reached
                     else
                     {
-                        Console.WriteLine("== reached NF ==");
+                        Log("== reached NF ==", annotate);
                         return this;
                     }
                 }
+                // otherwise, no reduction can take place, a constant/ variable is in whnf
                 else
                 {
-                    Console.WriteLine("== reached WHNF ==");
+                    Log("== reached WHNF ==", annotate);
                     return this;
                 }
             }
             else
             {
-                return new Application(this.expr1.Reduce(eval), this.expr2);
+                // finally, the expression is evaluated from left to right
+                if (IsRedex(this.expr1, eval))
+                {
+                    // left part can be reduced
+                    return new Application(this.expr1.Reduce(eval), this.expr2);
+                } else
+                {
+                    // left part cannot be reduced, expression is in whnf
+                    Log("== reached WHNF ==", annotate);
+                    return this;
+                }
             }
         }
 

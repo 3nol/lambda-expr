@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
 {
@@ -21,7 +21,7 @@ namespace lambda_cs.Components
         // collects free variables by adding the only one in scope - itself
         public override List<char> GetFreeVars()
         {
-            return new List<char>(this.var);
+            return new List<char>() { this.var };
         }
 
         // collects no bound variables because there can be none here
@@ -30,9 +30,11 @@ namespace lambda_cs.Components
             return new List<char>();
         }
 
-        public override LExpr Reduce(Evaluation _)
+        // tries to reduce this variable
+        public override LExpr Reduce(Evaluation _, bool annotate)
         {
-            Console.WriteLine("== reached NF ==");
+            // a variable is already in normal form
+            Log("== reached NF ==", annotate);
             return this;
         }
 

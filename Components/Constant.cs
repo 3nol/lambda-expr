@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
 {
@@ -67,9 +68,11 @@ namespace lambda_cs.Components
             return new List<char>();
         }
 
-        public override LExpr Reduce(Evaluation eval)
+        // tries to reduce this constant
+        public override LExpr Reduce(Evaluation _, bool annotate)
         {
-            Console.WriteLine("== reached NF ==");
+            // a constant is already in normal form
+            Log("== reached NF ==", annotate);
             return this;
         }
 
@@ -79,7 +82,7 @@ namespace lambda_cs.Components
             if (other is Constant)
             {
                 var otherConst = other as Constant;
-                return this.type.Equals(otherConst.GetType()) && this.content.Equals(otherConst.GetContent());
+                return this.type.Equals(otherConst.GetConstantType()) && this.content.Equals(otherConst.GetContent());
             }
             else
             {

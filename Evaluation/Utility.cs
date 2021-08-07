@@ -87,7 +87,7 @@ namespace lambda_cs.Evaluation
 
         public static bool IsRedex(LExpr expr, Components.Evaluation eval)
         {
-            return !expr.Equals(expr.Reduce(eval));
+            return !expr.Equals(expr.Reduce(eval, false));
         }
 
         public static LExpr DeltaReduce(Constant op, Constant e1, Constant e2)
@@ -128,6 +128,14 @@ namespace lambda_cs.Evaluation
                     break;
             }
             return null;
+        }
+
+        public static void Log(string message, bool visible)
+        {
+            if (visible)
+            {
+                Console.WriteLine(message);
+            }
         }
     }
 }

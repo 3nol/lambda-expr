@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
 {
@@ -44,9 +45,11 @@ namespace lambda_cs.Components
             return boundVars;
         }
 
-        public override LExpr Reduce(Evaluation eval)
+        // reduces the lambda expression
+        public override LExpr Reduce(Evaluation _, bool annotate)
         {
-            Console.WriteLine("== reached WHNF ==");
+            // for lazy and eager evaluation, a single lambda expression is already in WHNF
+            Log("== reached WHNF ==", annotate);
             return this;
         }
 
