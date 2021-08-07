@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace lambda_cs.Components
 {
     class Application : LExpr
     {
+        // first part of application
         private LExpr expr1;
+        // second part of application
         private LExpr expr2;
 
         public Application(LExpr e1, LExpr e2)
@@ -25,17 +26,21 @@ namespace lambda_cs.Components
             return this.expr2;
         }
 
-        public override List <char> getFreeVars()
+        // collects free variables by combinbing all free variables found
+        // in the two sub expressions
+        public override List<char> GetFreeVars()
         {
-            var freeVars = this.expr1.getFreeVars();
-            freeVars.AddRange(this.expr2.getFreeVars());
+            var freeVars = this.expr1.GetFreeVars();
+            freeVars.AddRange(this.expr2.GetFreeVars());
             return freeVars;
         }
 
-        public override List<char> getBoundVars()
+        // collects bound variables by combinbing all bound variables found
+        // in the two sub expressions
+        public override List<char> GetBoundVars()
         {
-            var boundVars = this.expr1.getBoundVars();
-            boundVars.AddRange(this.expr2.getBoundVars());
+            var boundVars = this.expr1.GetBoundVars();
+            boundVars.AddRange(this.expr2.GetBoundVars());
             return boundVars;
         }
 
@@ -44,6 +49,7 @@ namespace lambda_cs.Components
             throw new NotImplementedException();
         }
 
+        // this application is only equal if both subexpression are equal to other expression
         public override bool Equals(LExpr other)
         {
             if (other is Application)
@@ -57,6 +63,9 @@ namespace lambda_cs.Components
             }
         }
 
+        // converts to a string by converting both subexpressions and placing parentheses only when:
+        // - around first subexpression if it is a Lambda
+        // - around second subexpression if if is either a Lambda or an Application
         public override string ToString()
         {
             var e1 = this.expr1 is Lambda ? "(" + this.expr1.ToString() + ")" : this.expr1.ToString();
