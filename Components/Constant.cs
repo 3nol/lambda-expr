@@ -67,9 +67,10 @@ namespace lambda_cs.Components
             return new List<char>();
         }
 
-        public override List<Operation> Reduce(Evaluation eval)
+        public override LExpr Reduce(Evaluation eval)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("== reached NF ==");
+            return this;
         }
 
         // this constant is equal to another one if the type and content are equal

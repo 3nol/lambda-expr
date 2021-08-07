@@ -16,12 +16,12 @@ namespace lambda_cs.Components
             this.expr = e;
         }
 
-        public char getVar()
+        public char GetVar()
         {
             return this.var;
         }
 
-        public LExpr getExpr()
+        public LExpr GetExpr()
         {
             return this.expr;
         }
@@ -44,9 +44,10 @@ namespace lambda_cs.Components
             return boundVars;
         }
 
-        public override List<Operation> Reduce(Evaluation eval)
+        public override LExpr Reduce(Evaluation eval)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("== reached WHNF ==");
+            return this;
         }
 
         // this lambda is only equal if variable name and the body expression are equal
@@ -55,7 +56,7 @@ namespace lambda_cs.Components
             if (other is Lambda)
             {
                 var otherLam = other as Lambda;
-                return this.var.Equals(otherLam.getVar()) && this.expr.Equals(otherLam.getExpr());
+                return this.var.Equals(otherLam.GetVar()) && this.expr.Equals(otherLam.GetExpr());
             }
             else
             {
@@ -68,11 +69,11 @@ namespace lambda_cs.Components
         public override string ToString()
         {
             var str = "\\" + this.var;
-            LExpr body = this.getExpr(); ;
+            LExpr body = this.GetExpr(); ;
             while (body is Lambda)
             {
-                str += " " + (body as Lambda).getVar();
-                body = (body as Lambda).getExpr();
+                str += " " + (body as Lambda).GetVar();
+                body = (body as Lambda).GetExpr();
             }
             return str + ". " + body.ToString();
         }

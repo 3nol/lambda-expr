@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
 {
@@ -16,14 +17,24 @@ namespace lambda_cs.Components
             this.expr2 = e2;
         }
 
-        public LExpr getExpr1()
+        public LExpr GetExpr1()
         {
             return this.expr1;
         }
 
-        public LExpr getExpr2()
+        public LExpr GetExpr2()
         {
             return this.expr2;
+        }
+
+        public void SetExpr1(LExpr e)
+        {
+            this.expr1 = e;
+        }
+        
+        public void SetExpr2(LExpr e)
+        {
+            this.expr2 = e;
         }
 
         // collects free variables by combinbing all free variables found
@@ -44,9 +55,61 @@ namespace lambda_cs.Components
             return boundVars;
         }
 
-        public override List<Operation> Reduce(Evaluation eval)
+        public override LExpr Reduce(Evaluation eval)
         {
-            throw new NotImplementedException();
+            if (this.expr1 is Lambda)
+            {
+                var lambda = this.expr1 as Lambda;
+                if (eval == Evaluation.Eager && IsRedex(this.expr2, eval))
+                {
+                    return new Application(lambda, this.expr2.Reduce(eval));
+                }
+                else if (NameCapture(lambda.GetExpr(), this.expr2).Count == 0)
+                {
+                    var e = Substitute(lambda, lambda.GetVar(), this.expr2);
+                    Console.WriteLine("--beta-> " + e.ToString());
+                    return e;
+                }
+                else
+                {
+                    var e = Substitute(lambda, lambda.GetVar(), this.expr2);
+                    Console.WriteLine("--alpha-> " + e.ToString());
+                    return e;
+                }
+            }
+            else if (this.expr1 is Application)
+            {
+                var app = this.expr1 as Application;
+                if ((app.GetExpr1() is Constant) && (app.GetExpr1() as Constant).GetConstantType() == Constant.Type.Operator)
+                {
+                    if (IsRedex(app.GetExpr2(), eval))
+                    {
+                        return new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval)), this.expr2);
+                    }
+                    else if (IsRedex(this.expr2, eval))
+                    {
+                        return new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval));
+                    }
+                    else if (app.GetExpr2() is Constant && this.expr2 is Constant)
+                    {
+                        return DeltaReduce(app.GetExpr1() as Constant, app.GetExpr2() as Constant, this.expr2 as Constant);
+                    }
+                    else
+                    {
+                        Console.WriteLine("== reached NF ==");
+                        return this;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("== reached WHNF ==");
+                    return this;
+                }
+            }
+            else
+            {
+                return new Application(this.expr1.Reduce(eval), this.expr2);
+            }
         }
 
         // this application is only equal if both subexpression are equal to other expression
@@ -55,7 +118,7 @@ namespace lambda_cs.Components
             if (other is Application)
             {
                 var otherApp = other as Application;
-                return this.expr1.Equals(otherApp.getExpr1()) && this.expr2.Equals(otherApp.getExpr2());
+                return this.expr1.Equals(otherApp.GetExpr1()) && this.expr2.Equals(otherApp.GetExpr2());
             }
             else
             {

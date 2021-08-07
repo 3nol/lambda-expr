@@ -13,7 +13,7 @@ namespace lambda_cs.Components
             this.var = v;
         }
 
-        public char getVar()
+        public char GetVar()
         {
             return this.var;
         }
@@ -30,9 +30,10 @@ namespace lambda_cs.Components
             return new List<char>();
         }
 
-        public override List<Operation> Reduce(Evaluation eval)
+        public override LExpr Reduce(Evaluation _)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("== reached NF ==");
+            return this;
         }
 
         // this variable is only equal to another one if the name is equal
@@ -41,7 +42,7 @@ namespace lambda_cs.Components
             if (other is Variable)
             {
                 var otherVar = other as Variable;
-                return this.var.Equals(otherVar.getVar());
+                return this.var.Equals(otherVar.GetVar());
             }
             else
             {
