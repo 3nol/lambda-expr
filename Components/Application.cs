@@ -25,7 +25,26 @@ namespace lambda_cs.Components
             return this.expr2;
         }
 
-        bool IEquatable<LExpr>.Equals(LExpr other)
+        public override List <char> getFreeVars()
+        {
+            var freeVars = this.expr1.getFreeVars();
+            freeVars.AddRange(this.expr2.getFreeVars());
+            return freeVars;
+        }
+
+        public override List<char> getBoundVars()
+        {
+            var boundVars = this.expr1.getBoundVars();
+            boundVars.AddRange(this.expr2.getBoundVars());
+            return boundVars;
+        }
+
+        public override List<Operation> Reduce(Evaluation eval)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Equals(LExpr other)
         {
             if (other is Application)
             {
@@ -38,25 +57,10 @@ namespace lambda_cs.Components
             }
         }
 
-        List<char> LExpr.getFreeVars()
-        {
-            var freeVars = this.expr1.getFreeVars();
-            freeVars.AddRange(this.expr2.getFreeVars());
-            return freeVars;
-        }
-
-        List<char> LExpr.getBoundVars()
-        {
-            var boundVars = this.expr1.getBoundVars();
-            boundVars.AddRange(this.expr2.getBoundVars());
-            return boundVars;
-        }
-
         public override string ToString()
         {
-            // TODO remove unnecessary Parentheses
-            var e1 = this.expr1 is Variable ? this.expr1.ToString() : "(" + this.expr1.ToString() + ")";
-            var e2 = this.expr2 is Variable ? this.expr2.ToString() : "(" + this.expr2.ToString() + ")";
+            var e1 = this.expr1 is Lambda ? "(" + this.expr1.ToString() + ")" : this.expr1.ToString();
+            var e2 = this.expr2 is Variable || this.expr2 is Constant ? this.expr2.ToString() : "(" + this.expr2.ToString() + ")";
             return e1 + " " + e2;
         }
     }

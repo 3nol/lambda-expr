@@ -26,37 +26,48 @@ namespace lambda_cs.Components
             return this.expr;
         }
 
-        bool IEquatable<LExpr>.Equals(LExpr other)
-        {
-            if (other is Lambda)
-            {
-                var otherLam = other as Lambda;
-                return this.var.Equals(otherLam.getVar()) && this.expr.Equals(otherLam.getExpr());
-            } 
-            else
-            {
-                return false;
-            }
-        }
-
-        List<char> LExpr.getFreeVars()
+        public override List<char> getFreeVars()
         {
             var freeVars = this.expr.getFreeVars();
             freeVars.RemoveAll(item => item.Equals(this.var));
             return freeVars;
         }
 
-        List<char> LExpr.getBoundVars()
+        public override List<char> getBoundVars()
         {
             var boundVars = this.expr.getBoundVars();
             boundVars.Add(this.var);
             return boundVars;
         }
 
+        public override List<Operation> Reduce(Evaluation eval)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Equals(LExpr other)
+        {
+            if (other is Lambda)
+            {
+                var otherLam = other as Lambda;
+                return this.var.Equals(otherLam.getVar()) && this.expr.Equals(otherLam.getExpr());
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public override string ToString()
         {
-            // TODO merge consecutive Lambdas
-            return "\\" + this.var + ". " + this.expr.ToString();
+            var str = "\\" + this.var;
+            LExpr body = this.getExpr(); ;
+            while (body is Lambda)
+            {
+                str += " " + (body as Lambda).getVar();
+                body = (body as Lambda).getExpr();
+            }
+            return str + ". " + body.ToString();
         }
     }
 }

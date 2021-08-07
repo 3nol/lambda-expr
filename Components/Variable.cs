@@ -17,7 +17,22 @@ namespace lambda_cs.Components
             return this.var;
         }
 
-        bool IEquatable<LExpr>.Equals(LExpr other)
+        public override List<char> getFreeVars()
+        {
+            return new List<char>(this.var);
+        }
+
+        public override List<char> getBoundVars()
+        {
+            return new List<char>();
+        }
+
+        public override List<Operation> Reduce(Evaluation eval)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Equals(LExpr other)
         {
             if (other is Variable)
             {
@@ -28,17 +43,6 @@ namespace lambda_cs.Components
             {
                 return false;
             }
-        }
-
-
-        List<char> LExpr.getFreeVars()
-        {
-            return new List<char>(this.var);
-        }
-
-        List<char> LExpr.getBoundVars()
-        {
-            return new List<char>();
         }
 
         public override string ToString()

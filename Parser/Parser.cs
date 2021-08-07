@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using lambda_cs.Components;
 
@@ -13,15 +14,30 @@ namespace lambda_cs.Parser
             {
                 if (expr.StartsWith('\\'))
                 {
-                    return new Lambda(expr[1], Parse(expr.Substring(3)));
+                    var vars = new List<char>();
+                    var k = 1;
+                    while (!'.'.Equals(expr[k]))
+                    {
+                        if (!' '.Equals(expr[k]))
+                        {
+                            vars.Add(expr[k]);
+                        }
+                        k++;
+                    }
+                    LExpr agg = Parse(expr.Substring(k + 1));
+                    for (var i = vars.Count - 1; i >= 0; i--)
+                    {
+                        agg = new Lambda(vars[i], agg);
+                    }
+                    return agg;
                 } 
                 else if (!new Regex("\\(|\\)|\\\\|\\.").IsMatch(expr))
                 {
                     var parts = expr.Split(" ");
-                    LExpr agg = new Variable(parts[0][0]);
+                    LExpr agg = ParseTerminal(parts[0]);
                     for (var i = 1; i < parts.Length; i++)
                     {
-                        agg = new Application(agg, new Variable(parts[i][0]));
+                        agg = new Application(agg, ParseTerminal(parts[i]));
                     }
                     return agg;
                 }
@@ -89,6 +105,18 @@ namespace lambda_cs.Parser
             parts.Add(current.Trim());
             parts.RemoveAll(item => "".Equals(item));
             return parts;
+        }
+
+        private static LExpr ParseTerminal(string expr)
+        {
+            if (new Regex("\\+|-|\\*|/|=|\\d+|'.+'").IsMatch(expr))
+            {
+                return new Constant(expr);
+            }
+            else
+            {
+                return new Variable(expr[0]);
+            }
         }
     }
 }
