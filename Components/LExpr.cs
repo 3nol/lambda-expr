@@ -48,10 +48,13 @@ namespace lambda_cs.Components
     {
         static void Main(string[] _)
         {
+            LambdaInteractive(Evaluation.Lazy);
+
+            /*
             // beta reductions
             var yCombinator = new Application(new Lambda('f', new Application(new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x')))),
                                                        new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x')))))),
-                                       new Constant("42"));
+                                              new Constant("42"));
             Console.WriteLine("\n" + yCombinator.ToString());
             yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
@@ -64,6 +67,25 @@ namespace lambda_cs.Components
             var alph = Parse("(\\x y. x) y");
             Console.WriteLine("\n" + alph.ToString());
             alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+            */
+        }
+
+        static void LambdaInteractive(Evaluation eval)
+        {
+            var control = "";
+            while (!"END".Equals(control))
+            {
+                Console.WriteLine("Enter a lambda expression that shall be reduced.");
+                var expr = Parse(Console.ReadLine());
+                LExpr reduced = expr;
+                do
+                {
+                    expr = reduced;
+                    reduced = expr.Reduce(eval);
+                } while (!expr.Equals(reduced));
+
+                control = Console.ReadLine();
+            }
         }
     }
 }

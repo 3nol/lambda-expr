@@ -80,7 +80,7 @@ namespace lambda_cs.Evaluation
                     // going down 1 deeper ends current section
                     if ('('.Equals(str[i]))
                     {
-                        parts.Add(current.Trim());
+                        parts.AddRange(current.Trim().Split(" "));
                         current = "";
                         level++;
                     }
@@ -123,7 +123,7 @@ namespace lambda_cs.Evaluation
                 }
             }
             // adding last collected section
-            parts.Add(current.Trim());
+            parts.AddRange(current.Trim().Split(" "));
             // removing empty sections
             parts.RemoveAll(item => "".Equals(item));
             return parts;
