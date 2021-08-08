@@ -63,7 +63,7 @@ namespace lambda_cs.Components
 
     class Expression
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length > 0 && "-i".Equals(args[0]))
             {
@@ -94,22 +94,34 @@ namespace lambda_cs.Components
         }
 
         // interactive lambda expression input, parsing and reduction
-        static void LambdaInteractive(Evaluation eval)
+        private static void LambdaInteractive(Evaluation eval)
         {
-            var control = "";
-            while (!"END".Equals(control))
+            while (true)
             {
-                Console.WriteLine("Enter a lambda expression that shall be reduced.");
-                var expr = Parse(Console.ReadLine());
-                var reduced = expr;
-                do
+                var input = GetInput();
+                if ("END".Equals(input))
                 {
-                    expr = reduced;
-                    reduced = expr.Reduce(eval);
-                } while (!expr.Equals(reduced));
-
-                control = Console.ReadLine();
+                    break;
+                } 
+                else
+                {
+                    var expr = Parse(input);
+                    var reduced = expr;
+                    do
+                    {
+                        expr = reduced;
+                        reduced = expr.Reduce(eval);
+                    } while (!expr.Equals(reduced));
+                    Console.WriteLine();
+                }
             }
+        }
+
+        private static string GetInput()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Write("\u03bb> ");
+            return Console.ReadLine();
         }
     }
 }
