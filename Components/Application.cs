@@ -26,16 +26,6 @@ namespace lambda_cs.Components
             return this.expr2;
         }
 
-        public void SetExpr1(LExpr e)
-        {
-            this.expr1 = e;
-        }
-        
-        public void SetExpr2(LExpr e)
-        {
-            this.expr2 = e;
-        }
-
         // collects free variables by combinbing all free variables found
         // in the two sub expressions
         public override List<char> GetFreeVars()
@@ -64,7 +54,9 @@ namespace lambda_cs.Components
                 // eager evaluation reduces the argument before the function
                 if (eval == Evaluation.Eager && IsRedex(this.expr2, eval))
                 {
-                    return new Application(lambda, this.expr2.Reduce(eval));
+                    var e = new Application(lambda, this.expr2.Reduce(eval, false));
+                    Log("--beta-> " + e.ToString(), annotate);
+                    return e;
                 }
                 // if a name captures is not present, this lambda abstraction is reduced
                 else if (NameCapture(lambda.GetExpr(), this.expr2).Count == 0)
@@ -91,12 +83,16 @@ namespace lambda_cs.Components
                     // reduce first argument
                     if (IsRedex(app.GetExpr2(), eval))
                     {
-                        return new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval)), this.expr2);
+                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval, false)), this.expr2);
+                        Log("--beta-> " + e.ToString(), annotate);
+                        return e;
                     }
                     // reduce second argument
                     else if (IsRedex(this.expr2, eval))
                     {
-                        return new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval));
+                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval, false));
+                        Log("--beta-> " + e.ToString(), annotate);
+                        return e;
                     }
                     // make delta reduction by evaluating the operator
                     else if (app.GetExpr2() is Constant && this.expr2 is Constant)
@@ -112,26 +108,29 @@ namespace lambda_cs.Components
                         return this;
                     }
                 }
-                // otherwise, no reduction can take place, a constant/ variable is in whnf
                 else
                 {
-                    Log("== reached WHNF ==", annotate);
-                    return this;
+                    // finally, the expression is evaluated from left to right
+                    if (IsRedex(this.expr1, eval))
+                    {
+                        // left part can be reduced
+                        var e = new Application(this.expr1.Reduce(eval, false), this.expr2);
+                        Log("--beta-> " + e.ToString(), annotate);
+                        return e;
+                    }
+                    else
+                    {
+                        // left part cannot be reduced, expression is in whnf
+                        Log("== reached WHNF ==", annotate);
+                        return this;
+                    }
                 }
             }
+            // otherwise, no reduction can take place, a constant/ variable is in whnf
             else
             {
-                // finally, the expression is evaluated from left to right
-                if (IsRedex(this.expr1, eval))
-                {
-                    // left part can be reduced
-                    return new Application(this.expr1.Reduce(eval), this.expr2);
-                } else
-                {
-                    // left part cannot be reduced, expression is in whnf
-                    Log("== reached WHNF ==", annotate);
-                    return this;
-                }
+                Log("== reached WHNF ==", annotate);
+                return this;
             }
         }
 
