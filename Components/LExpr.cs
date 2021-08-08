@@ -63,29 +63,34 @@ namespace lambda_cs.Components
 
     class Expression
     {
-        static void Main(string[] _)
+        static void Main(string[] args)
         {
-            // LambdaInteractive(Evaluation.Lazy);
+            if (args.Length > 0 && "-i".Equals(args[0]))
+            {
+                LambdaInteractive(Evaluation.Lazy);
+            }
+            else
+            {
+                // beta reductions
+                var yCombinator = Parse("(\\f. (\\x. f (x x)) (\\x. f (x x))) 42");
+                Console.WriteLine("\n" + yCombinator.ToString());
+                yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-            // beta reductions
-            var yCombinator = Parse("(\\f. (\\x. f (x x)) (\\x. f (x x))) 42");
-            Console.WriteLine("\n" + yCombinator.ToString());
-            yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+                // delta reduction
+                var calc = Parse("+ 42 (* 6 2)");
+                Console.WriteLine("\n" + calc.ToString());
+                calc.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-            // delta reduction
-            var calc = Parse("+ 42 (* 6 2)");
-            Console.WriteLine("\n" + calc.ToString());
-            calc.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+                // alpha conversion
+                var alph = Parse("(\\x y. x) y");
+                Console.WriteLine("\n" + alph.ToString());
+                alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-            // alpha conversion
-            var alph = Parse("(\\x y. x) y");
-            Console.WriteLine("\n" + alph.ToString());
-            alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
-
-            // ultimate alpha test
-            var alph2 = Parse("(\\f x. g (\\x. f x)) x (\\x. x)");
-            Console.WriteLine("\n" + alph2.ToString());
-            alph2.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+                // ultimate alpha test
+                var alph2 = Parse("(\\f x. g (\\x. f x)) x (\\x. x)");
+                Console.WriteLine("\n" + alph2.ToString());
+                alph2.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+            }
         }
 
         // interactive lambda expression input, parsing and reduction
