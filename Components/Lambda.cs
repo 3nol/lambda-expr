@@ -49,6 +49,7 @@ namespace lambda_cs.Components
         public override LExpr Reduce(Evaluation _, bool annotate)
         {
             // for lazy and eager evaluation, a single lambda expression is already in WHNF
+            lastOperation = Operation.None;
             Log("== reached WHNF ==", annotate);
             return this;
         }

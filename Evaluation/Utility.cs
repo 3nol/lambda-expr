@@ -83,7 +83,7 @@ namespace lambda_cs.Evaluation
             else if (source is Application)
             {
                 var a = source as Application;
-                // replacementn in both subexpressions
+                // replacement in both subexpressions
                 return new Application(VarReplace(a.GetExpr1(), target, substitute), VarReplace(a.GetExpr2(), target, substitute));
             }
             else if (source is Lambda)
@@ -196,7 +196,23 @@ namespace lambda_cs.Evaluation
         {
             if (visible)
             {
-                Console.WriteLine(message);
+                var prompt = "";
+                switch (LExpr.GetLastOperation())
+                {
+                    case Operation.Alpha:
+                        prompt = "-a-> ";
+                        break;
+                    case Operation.Beta:
+                        prompt = "-b-> ";
+                        break;
+                    case Operation.Delta:
+                        prompt = "-d-> ";
+                        break;
+                    default:
+                        prompt = "";
+                        break;
+                }
+                Console.WriteLine(prompt + message);
             }
         }
     }

@@ -55,15 +55,16 @@ namespace lambda_cs.Components
                 // eager evaluation reduces the argument before the function
                 if (eval == Evaluation.Eager && IsRedex(this.expr2, eval))
                 {
-                    var e = new Application(lambda, this.expr2.Reduce(eval));
-                    Log(betaPrompt + e.ToString(), annotate);
+                    var e = new Application(lambda, this.expr2.Reduce(eval, false));
+                    Log(e.ToString(), annotate);
                     return e;
                 }
                 // if a name captures is not present, this lambda abstraction is reduced
                 else if (GetNameCaptures(lambda.GetExpr(), this.expr2).Count == 0)
                 {
                     var e = Substitute(lambda.GetExpr(), lambda.GetVar(), this.expr2);
-                    Log(betaPrompt + e.ToString(), annotate);
+                    lastOperation = Operation.Beta;
+                    Log(e.ToString(), annotate);
                     return e;
                 }
                 // if a name capture happens, alpha conversion is done
@@ -71,7 +72,8 @@ namespace lambda_cs.Components
                 {
                     var z = GetNewVar(lambda.GetExpr(), this.expr2);
                     var e = new Application(VarReplace(lambda, GetNameCaptures(lambda.GetExpr(), this.expr2)[0], z), this.expr2);
-                    Log(alphaPrompt + e.ToString(), annotate);
+                    lastOperation = Operation.Alpha;
+                    Log(e.ToString(), annotate);
                     return e;
                 }
             }
@@ -85,27 +87,29 @@ namespace lambda_cs.Components
                     // reduce first argument
                     if (IsRedex(app.GetExpr2(), eval))
                     {
-                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval)), this.expr2);
-                        Log(betaPrompt + e.ToString(), annotate);
+                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2().Reduce(eval, false)), this.expr2);
+                        Log(e.ToString(), annotate);
                         return e;
                     }
                     // reduce second argument
                     else if (IsRedex(this.expr2, eval))
                     {
-                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval));
-                        Log(betaPrompt + e.ToString(), annotate);
+                        var e = new Application(new Application(app.GetExpr1(), app.GetExpr2()), this.expr2.Reduce(eval, false));
+                        Log(e.ToString(), annotate);
                         return e;
                     }
                     // make delta reduction by evaluating the operator
                     else if (app.GetExpr2() is Constant && this.expr2 is Constant)
                     {
                         var e = DeltaReduce(app.GetExpr1() as Constant, app.GetExpr2() as Constant, this.expr2 as Constant);
-                        Log(deltaPrompt + e.ToString(), annotate);
+                        lastOperation = Operation.Delta;
+                        Log(e.ToString(), annotate);
                         return e;
                     }
                     // if operator has no fitting arguments, nf is reached
                     else
                     {
+                        lastOperation = Operation.None;
                         Log("== reached NF ==", annotate);
                         return this;
                     }
@@ -116,13 +120,14 @@ namespace lambda_cs.Components
                     if (IsRedex(this.expr1, eval))
                     {
                         // left part can be reduced
-                        var e = new Application(this.expr1.Reduce(eval), this.expr2);
-                        Log(betaPrompt + e.ToString(), annotate);
+                        var e = new Application(this.expr1.Reduce(eval, false), this.expr2);
+                        Log(e.ToString(), annotate);
                         return e;
                     }
                     else
                     {
                         // left part cannot be reduced, expression is in whnf
+                        lastOperation = Operation.None;
                         Log("== reached WHNF ==", annotate);
                         return this;
                     }
@@ -131,6 +136,7 @@ namespace lambda_cs.Components
             // otherwise, no reduction can take place, a constant/ variable is in whnf
             else
             {
+                lastOperation = Operation.None;
                 Log("== reached WHNF ==", annotate);
                 return this;
             }

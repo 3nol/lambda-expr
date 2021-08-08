@@ -72,6 +72,7 @@ namespace lambda_cs.Components
         public override LExpr Reduce(Evaluation _, bool annotate)
         {
             // a constant is already in normal form
+            lastOperation = Operation.None;
             Log("== reached NF ==", annotate);
             return this;
         }
