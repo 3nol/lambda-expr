@@ -16,6 +16,10 @@ namespace lambda_cs.Components
 
     public abstract class LExpr : IEquatable<LExpr>
     {
+        protected string alphaPrompt = "-a-> ";
+        protected string betaPrompt = "-b-> ";
+        protected string deltaPrompt = "-d-> ";
+
         // concept of free variables: are retrieved here
         public abstract List<char> GetFreeVars();
 
@@ -48,18 +52,15 @@ namespace lambda_cs.Components
     {
         static void Main(string[] _)
         {
-            LambdaInteractive(Evaluation.Lazy);
+            // LambdaInteractive(Evaluation.Lazy);
 
-            /*
             // beta reductions
-            var yCombinator = new Application(new Lambda('f', new Application(new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x')))),
-                                                       new Lambda('x', new Application(new Variable('f'), new Application(new Variable('x'), new Variable('x')))))),
-                                              new Constant("42"));
+            var yCombinator = Parse("(\\f. (\\x. f (x x)) (\\x. f (x x))) 42");
             Console.WriteLine("\n" + yCombinator.ToString());
             yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
             // delta reduction
-            var calc = new Application(new Application(new Constant("+"), new Constant("3")), new Constant("5"));
+            var calc = Parse("+ 42 (* 6 2)");
             Console.WriteLine("\n" + calc.ToString());
             calc.Reduce(Evaluation.Lazy);
 
@@ -67,9 +68,9 @@ namespace lambda_cs.Components
             var alph = Parse("(\\x y. x) y");
             Console.WriteLine("\n" + alph.ToString());
             alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
-            */
         }
 
+        // interactive lambda expression input, parsing and reduction
         static void LambdaInteractive(Evaluation eval)
         {
             var control = "";
@@ -77,7 +78,7 @@ namespace lambda_cs.Components
             {
                 Console.WriteLine("Enter a lambda expression that shall be reduced.");
                 var expr = Parse(Console.ReadLine());
-                LExpr reduced = expr;
+                var reduced = expr;
                 do
                 {
                     expr = reduced;
