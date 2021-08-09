@@ -18,14 +18,36 @@ namespace lambda_cs.Components
     //   alpha conversion (= bound variable renaming)
     //   beta reduction (= term evaluation by substitution)
     //   delta reduction (= primitive calculation)
+    // 1 extra operation is the variable expansion, called when there are no redexes
     public enum Operation
     {
-        None, Alpha, Beta, Delta
+        None, Alpha, Beta, Delta, Expand
     }
 
     public abstract class LExpr : IEquatable<LExpr>
     {
+        // -- STATIC METHODS --
+        
+        protected static Dictionary<char, LExpr> assignedVariables = new Dictionary<char, LExpr>();
         protected static Operation lastOperation = Operation.None;
+
+        public static LExpr GetVariable(char name)
+        {
+            return assignedVariables[name];
+        }
+
+        public static void SetVariable(char name, LExpr expr)
+        {
+            assignedVariables[name] = expr;
+        }
+
+        // access to the last reduction operation
+        public static Operation GetLastOperation()
+        {
+            return LExpr.lastOperation;
+        }
+
+        // -- INSTANCE METHODS --
 
         // concept of free variables: are retrieved here
         public abstract List<char> GetFreeVars();
@@ -46,82 +68,41 @@ namespace lambda_cs.Components
         // - alpha conversion (= renaming)
         // - beta reduction (= reduction)
         // - delta reduction (= primitive calulation)
-        public abstract LExpr Reduce(Evaluation eval, bool annotate); 
+        public abstract LExpr Reduce(Evaluation eval, bool annotate);
+
+        // Expands one free variable if it has an assigned value
+        public abstract LExpr ExpandVariable(bool annotate);
 
         // has to implement the equality check
         public abstract bool Equals(LExpr other);
 
         // has to override the string representation for correct notation
         public override abstract string ToString();
-
-        // access to the last reduction operation
-        public static Operation GetLastOperation()
-        {
-            return LExpr.lastOperation;
-        }
     }
 
     class Expression
     {
-        public static void Main(string[] args)
+        public static void main(string[] _)
         {
-            if (args.Length > 0 && "-i".Equals(args[0]))
-            {
-                LambdaInteractive(Evaluation.Lazy);
-            }
-            else
-            {
-                // beta reductions
-                var yCombinator = Parse("(\\f. (\\x. f (x x)) (\\x. f (x x))) 42");
-                Console.WriteLine("\n" + yCombinator.ToString());
-                yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+            // beta reductions
+            var yCombinator = Parse("(\\f. (\\x. f (x x)) (\\x. f (x x))) 42");
+            Console.WriteLine("\n" + yCombinator.ToString());
+            yCombinator.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-                // delta reduction
-                var calc = Parse("+ 42 (* 6 2)");
-                Console.WriteLine("\n" + calc.ToString());
-                calc.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+            // delta reduction
+            var calc = Parse("+ 42 (* 6 2)");
+            Console.WriteLine("\n" + calc.ToString());
+            calc.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-                // alpha conversion
-                var alph = Parse("(\\x y. x) y");
-                Console.WriteLine("\n" + alph.ToString());
-                alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
+            // alpha conversion
+            var alph = Parse("(\\x y. x) y");
+            Console.WriteLine("\n" + alph.ToString());
+            alph.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
 
-                // ultimate alpha test
-                var alph2 = Parse("(\\f x. g (\\x. f x)) x (\\x. x)");
-                Console.WriteLine("\n" + alph2.ToString());
-                alph2.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
-            }
-        }
-
-        // interactive lambda expression input, parsing and reduction
-        private static void LambdaInteractive(Evaluation eval)
-        {
-            while (true)
-            {
-                var input = GetInput();
-                if ("END".Equals(input))
-                {
-                    break;
-                } 
-                else
-                {
-                    var expr = Parse(input);
-                    var reduced = expr;
-                    do
-                    {
-                        expr = reduced;
-                        reduced = expr.Reduce(eval);
-                    } while (!expr.Equals(reduced));
-                    Console.WriteLine();
-                }
-            }
-        }
-
-        private static string GetInput()
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.Write("\u03bb> ");
-            return Console.ReadLine();
+            // ultimate alpha test
+            var alph2 = Parse("(\\f x. g (\\x. f x)) x (\\x. x)");
+            Console.WriteLine("\n" + alph2.ToString());
+            alph2.Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy).Reduce(Evaluation.Lazy);
         }
     }
 }

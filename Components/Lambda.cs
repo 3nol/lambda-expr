@@ -50,7 +50,14 @@ namespace lambda_cs.Components
         {
             // for lazy and eager evaluation, a single lambda expression is already in WHNF
             lastOperation = Operation.None;
-            Log("== reached WHNF ==", annotate);
+            return this;
+        }
+
+        // expands nothing because it will not be evaluated
+        public override LExpr ExpandVariable(bool annotate)
+        {
+            // for lazy and eager evaluation, a single lambda expression is already in WHNF
+            lastOperation = Operation.None;
             return this;
         }
 

@@ -6,6 +6,48 @@ namespace lambda_cs.Evaluation
 {
     static class Utility
     {
+        // -- GETTER & CHECKER --
+
+        // retrieves all name captured variables when substituting 
+        public static List<char> GetNameCaptures(LExpr source, LExpr substitute)
+        {
+            var captured = new List<char>();
+            foreach (char v in source.GetBoundVars())
+            {
+                if (substitute.GetFreeVars().Contains(v))
+                {
+                    captured.Add(v);
+                }
+            }
+            return captured;
+        }
+
+        // for alpha conversion, a new variable name is necessary
+        // because there must not be variables named equal,
+        // this method retrieves the first unused variable name
+        public static char GetNewVar(LExpr source, LExpr substitute)
+        {
+            var usedVars = substitute.GetFreeVars();
+            usedVars.AddRange(source.GetFreeVars());
+            usedVars.AddRange(source.GetBoundVars());
+
+            var newVar = 'a';
+            while (usedVars.Contains(newVar))
+            {
+                newVar = (char)((int)newVar + 1);
+            }
+            return newVar;
+        }
+
+        // checker whether the current lambda expression can still be reduceds
+        // under that evaluation, i.e. is a REDucible EXpression
+        public static bool IsRedex(LExpr expr, Components.Evaluation eval)
+        {
+            return !expr.Equals(expr.Reduce(eval, false));
+        }
+
+        // -- EXPRESSION REPLACING --
+
         // essential meta operation on lambda expression, used for reduction of any kind
         public static LExpr Substitute(LExpr source, char target, LExpr substitute)
         {
@@ -103,43 +145,7 @@ namespace lambda_cs.Evaluation
             return null;
         }
 
-        // retrieves all name captured variables when substituting 
-        public static List<char> GetNameCaptures(LExpr source, LExpr substitute)
-        {
-            var captured = new List<char>();
-            foreach (char v in source.GetBoundVars())
-            {
-                if (substitute.GetFreeVars().Contains(v))
-                {
-                    captured.Add(v);
-                }
-            }
-            return captured;
-        }
-
-        // for alpha conversion, a new variable name is necessary
-        // because there must not be variables named equal,
-        // this method retrieves the first unused variable name
-        public static char GetNewVar(LExpr source, LExpr substitute)
-        {
-            var usedVars = substitute.GetFreeVars();
-            usedVars.AddRange(source.GetFreeVars());
-            usedVars.AddRange(source.GetBoundVars());
-
-            var newVar = 'a';
-            while (usedVars.Contains(newVar))
-            {
-                newVar = (char)((int)newVar + 1);
-            }
-            return newVar;
-        }
-
-        // checker whether the current lambda expression can still be reduceds
-        // under that evaluation, i.e. is a REDucible EXpression
-        public static bool IsRedex(LExpr expr, Components.Evaluation eval)
-        {
-            return !expr.Equals(expr.Reduce(eval, false));
-        }
+        // -- EXPRESSION CALCULATIOn --
 
         // does the primitive calculuations under the operators: { '+', '-', '*', '/', '=' }
         // { '-', '*', '/' } are only implemented for numeric constants whereas
@@ -191,6 +197,8 @@ namespace lambda_cs.Evaluation
             return null;
         }
 
+        // -- OTHER --
+
         // logging helper that takes an extra visibility argument
         public static void Log(string message, bool visible)
         {
@@ -200,18 +208,22 @@ namespace lambda_cs.Evaluation
                 switch (LExpr.GetLastOperation())
                 {
                     case Operation.Alpha:
-                        prompt = "-a-> ";
+                        prompt = " -α-> ";
                         break;
                     case Operation.Beta:
-                        prompt = "-b-> ";
+                        prompt = " -β-> ";
                         break;
                     case Operation.Delta:
-                        prompt = "-d-> ";
+                        prompt = " -δ-> ";
+                        break;
+                    case Operation.Expand:
+                        prompt = " ---> ";
                         break;
                     default:
                         prompt = "";
                         break;
                 }
+                Console.OutputEncoding = System.Text.Encoding.UTF8;
                 Console.WriteLine(prompt + message);
             }
         }

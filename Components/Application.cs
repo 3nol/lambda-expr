@@ -110,7 +110,6 @@ namespace lambda_cs.Components
                     else
                     {
                         lastOperation = Operation.None;
-                        Log("== reached NF ==", annotate);
                         return this;
                     }
                 }
@@ -128,7 +127,6 @@ namespace lambda_cs.Components
                     {
                         // left part cannot be reduced, expression is in whnf
                         lastOperation = Operation.None;
-                        Log("== reached WHNF ==", annotate);
                         return this;
                     }
                 }
@@ -137,7 +135,35 @@ namespace lambda_cs.Components
             else
             {
                 lastOperation = Operation.None;
-                Log("== reached WHNF ==", annotate);
+                return this;
+            }
+        }
+
+        // expands a single variable either in expr1 or expr2
+        public override LExpr ExpandVariable(bool annotate)
+        {
+            var firstExpanded = this.expr1.ExpandVariable(false);
+            var secondExpanded = this.expr2.ExpandVariable(false);
+            // variable expansion in expr1 possible
+            if (!this.expr1.Equals(firstExpanded))
+            {
+                var e = new Application(firstExpanded, this.expr2);
+                lastOperation = Operation.Expand;
+                Log(e.ToString(), annotate);
+                return e;
+            }
+            // variable expansion in expr2 possible
+            else if (!this.expr2.Equals(secondExpanded))
+            {
+                var e = new Application(this.expr1, secondExpanded);
+                lastOperation = Operation.Expand;
+                Log(e.ToString(), annotate);
+                return e;
+            }
+            else
+            {
+                // already everything expanded
+                lastOperation = Operation.None;
                 return this;
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static lambda_cs.Evaluation.Utility;
 
 namespace lambda_cs.Components
@@ -35,7 +36,19 @@ namespace lambda_cs.Components
         {
             // a variable is already in normal form
             lastOperation = Operation.None;
-            Log("== reached NF ==", annotate);
+            return this;
+        }
+
+        // replaces this single variable if it has a variable
+        public override LExpr ExpandVariable(bool annotate)
+        {
+            // if this variable was assigned a value, replace it
+            if (assignedVariables.TryGetValue(this.var, out LExpr value))
+            {
+                lastOperation = Operation.Expand;
+                Log(value.ToString(), annotate);
+                return value;
+            }
             return this;
         }
 

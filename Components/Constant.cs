@@ -73,7 +73,14 @@ namespace lambda_cs.Components
         {
             // a constant is already in normal form
             lastOperation = Operation.None;
-            Log("== reached NF ==", annotate);
+            return this;
+        }
+
+        // nothing to expand because a constant does not contain a variable 
+        public override LExpr ExpandVariable(bool annotate)
+        {
+            // a constant is already in normal form
+            lastOperation = Operation.None;
             return this;
         }
 
