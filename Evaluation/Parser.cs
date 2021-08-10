@@ -18,9 +18,17 @@ namespace lambda_cs.Evaluation
                 {
                     var vars = new List<char>();
                     var k = 1;
+                    // support for consecutive, nested lambdas
                     while (!'.'.Equals(expr[k]))
                     {
-                        if (!' '.Equals(expr[k]))
+                        // support for haskell lambda notation, e.g. \x -> x
+                        if ('-'.Equals(expr[k]))
+                        {
+                            k++;
+                            break;
+                        }
+                        // collect variables if not space
+                        else if (!' '.Equals(expr[k]))
                         {
                             vars.Add(expr[k]);
                         }
