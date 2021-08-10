@@ -93,6 +93,10 @@ namespace lambda_cs.Evaluation
                 {
                     Console.WriteLine("not implemented yet, ahah");
                 }
+                else if (input.ToLower().Equals("author"))
+                {
+                    Console.WriteLine("Leon Wenzler");
+                }
                 else
                 {
                     Console.WriteLine("invalid action");
