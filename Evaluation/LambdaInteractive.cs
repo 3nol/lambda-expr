@@ -43,14 +43,14 @@ namespace lambda_cs.Evaluation
                                       "    reduce [expr]          - reduces the expression according to the current strategy,\n" +
                                       "                             uses alpha conversion, beta & delta reduction and variable expansion");
                 }
-                else if (input.ToLower().StartsWith("set") && input.Split(" ").Length >= 3)
+                else if (input.ToLower().StartsWith("set") && input.Split(' ').Length >= 3)
                 {
-                    switch (input.Split(" ")[1].ToLower())
+                    switch (input.Split(' ')[1].ToLower())
                     {
                         case "evaluation":
                             try
                             {
-                                var evalName = char.ToUpper(input.Split(" ")[2][0]) + input.Split(" ")[2].Substring(1).ToLower();
+                                var evalName = char.ToUpper(input.Split(' ')[2][0]) + input.Split(' ')[2].Substring(1).ToLower();
                                 currentEval = (Components.Evaluation)Enum.Parse(Components.Evaluation.Lazy.GetType(), evalName);
                                 Console.WriteLine("using " + currentEval.ToString().ToLower() + " evaluation ");
                             }
@@ -64,18 +64,18 @@ namespace lambda_cs.Evaluation
                             break;
                     }
                 }
-                else if (input.ToLower().StartsWith("let") && input.Split(" ").Length >= 4 && input.Split(" ")[2].Equals("="))
+                else if (input.ToLower().StartsWith("let") && input.Split(' ').Length >= 2 && input.Contains('='))
                 {
-                    var name = input.Split(" ")[1][0];
-                    var expr = Parse(input.Split(" ", 4)[3]);
+                    var name = input.Split(' ')[1][0];
+                    var expr = Parse(input.Split('=', 2)[1]);
                     if (!(expr is Variable && (expr as Variable).GetVar().Equals(name)))
                     {
                         SetVariable(name, expr);
                     }
                 }
-                else if (input.ToLower().StartsWith("reduce") && input.Split(" ").Length >= 2)
+                else if (input.ToLower().StartsWith("reduce") && input.Split(' ').Length >= 2)
                 {
-                    var expr = Parse(input.Split(" ", 2)[1]);
+                    var expr = Parse(input.Split(' ', 2)[1]);
                     var reduced = expr;
                     do
                     {
@@ -89,7 +89,7 @@ namespace lambda_cs.Evaluation
                     } while (!expr.Equals(reduced));
                     Console.WriteLine("== reached WHNF ==\n");
                 }
-                else if (input.ToLower().StartsWith("ast") && input.Split(" ").Length >= 2)
+                else if (input.ToLower().StartsWith("ast") && input.Split(' ').Length >= 2)
                 {
                     Console.WriteLine("not implemented yet, ahah");
                 }

@@ -46,7 +46,7 @@ namespace lambda_cs.Evaluation
                 // parsing applications of variables and constants
                 else if (!new Regex("\\(|\\)|\\\\|\\.").IsMatch(expr))
                 {
-                    var parts = expr.Split(" ");
+                    var parts = expr.Split(' ');
                     // parsing terminal symbols (variables & constants),
                     // concatenating them with applications (foldl)
                     LExpr agg = ParseTerminal(parts[0]);
@@ -88,7 +88,7 @@ namespace lambda_cs.Evaluation
                     // going down 1 deeper ends current section
                     if ('('.Equals(str[i]))
                     {
-                        parts.AddRange(current.Trim().Split(" "));
+                        parts.AddRange(current.Trim().Split(' '));
                         current = "";
                         level++;
                     }
@@ -131,7 +131,7 @@ namespace lambda_cs.Evaluation
                 }
             }
             // adding last collected section
-            parts.AddRange(current.Trim().Split(" "));
+            parts.AddRange(current.Trim().Split(' '));
             // removing empty sections
             parts.RemoveAll(item => "".Equals(item));
             return parts;
