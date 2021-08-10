@@ -1,4 +1,5 @@
 ﻿using System;
+using lambda_cs.Components;
 using static lambda_cs.Components.LExpr;
 using static lambda_cs.Evaluation.Parser;
 
@@ -65,7 +66,12 @@ namespace lambda_cs.Evaluation
                 }
                 else if (input.ToLower().StartsWith("let") && input.Split(" ").Length >= 4 && input.Split(" ")[2].Equals("="))
                 {
-                    SetVariable(input.Split(" ")[1][0], Parse(input.Split(" ", 4)[3]));
+                    var name = input.Split(" ")[1][0];
+                    var expr = Parse(input.Split(" ", 4)[3]);
+                    if (!(expr is Variable && (expr as Variable).GetVar().Equals(name)))
+                    {
+                        SetVariable(name, expr);
+                    }
                 }
                 else if (input.ToLower().StartsWith("reduce") && input.Split(" ").Length >= 2)
                 {
