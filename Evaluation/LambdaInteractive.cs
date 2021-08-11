@@ -2,6 +2,7 @@
 using lambda_cs.Components;
 using static lambda_cs.Components.LExpr;
 using static lambda_cs.Evaluation.Parser;
+using static lambda_cs.Renderer.ASTBuilder;
 
 namespace lambda_cs.Evaluation
 {
@@ -41,7 +42,8 @@ namespace lambda_cs.Evaluation
                                       "- lambda expressions:\n" +
                                       "    let [var] = [expr]     - assigns a lambda expression to the variable\n" +
                                       "    reduce [expr]          - reduces the expression according to the current strategy,\n" +
-                                      "                             uses alpha conversion, beta & delta reduction and variable expansion");
+                                      "                             uses alpha conversion, beta & delta reduction and variable expansion\n" +
+                                      "    ast [expr]             - displays an abstract syntax tree of the given expression");
                 }
                 else if (input.ToLower().StartsWith("set") && input.Split(' ').Length >= 3)
                 {
@@ -91,7 +93,7 @@ namespace lambda_cs.Evaluation
                 }
                 else if (input.ToLower().StartsWith("ast") && input.Split(' ').Length >= 2)
                 {
-                    Console.WriteLine("not implemented yet, ahah");
+                    Console.WriteLine(BuildTree(Parse(input.Split(' ', 2)[1])));
                 }
                 else if (input.ToLower().Equals("author"))
                 {

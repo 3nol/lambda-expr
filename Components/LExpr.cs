@@ -28,8 +28,8 @@ namespace lambda_cs.Components
     {
         // -- STATIC METHODS --
         
-        protected static Dictionary<char, LExpr> assignedVariables = new Dictionary<char, LExpr>();
-        protected static Operation lastOperation = Operation.None;
+        internal static Dictionary<char, LExpr> assignedVariables = new Dictionary<char, LExpr>();
+        internal static Operation lastOperation = Operation.None;
 
         public static LExpr GetVariable(char name)
         {

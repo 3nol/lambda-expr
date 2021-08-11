@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace lambda_cs.Renderer
+﻿namespace lambda_cs.Renderer
 {
-    abstract class AsciiPlane
+    class AsciiPlane
     {
         public enum PlaneAlignment
         {
@@ -15,24 +11,19 @@ namespace lambda_cs.Renderer
 
         private char[,] plane;
 
-        protected AsciiPlane(char[,] plane)
+        internal AsciiPlane(char[,] plane)
         {
             this.plane = plane;
+            this.plane = FillBlanks(this.plane, ' ');
         }
 
-        protected AsciiPlane(int width, int height)
+        internal AsciiPlane(int width, int height)
         {
             this.plane = new char[width, height];
-            for (var i = 0; i < this.GetWidth(); i++)
-            {
-                for (var j = 0; j < this.GetHeight(); j++)
-                {
-                    this.plane[i, j] = ' ';
-                }
-            }
+            this.plane = FillBlanks(this.plane, ' ');
         }
 
-        protected AsciiPlane (int width, int height, AsciiPlane subplane, PlaneAlignment alignment) : this(width, height)
+        internal AsciiPlane (int width, int height, AsciiPlane subplane, PlaneAlignment alignment) : this(width, height)
         {
             if (subplane.GetWidth() <= this.GetWidth() && subplane.GetHeight() <= this.GetHeight())
             {
@@ -40,7 +31,22 @@ namespace lambda_cs.Renderer
             }
         }
 
-        protected AsciiPlane(int width, int height, AsciiPlane subplane) : this(width, height, subplane, PlaneAlignment.TOP_LEFT) {}
+        internal AsciiPlane(int width, int height, AsciiPlane subplane) : this(width, height, subplane, PlaneAlignment.TOP_LEFT) {}
+
+        private static char[,] FillBlanks(char[,] array, char fill)
+        {
+            for (var i = 0; i < array.GetLength(0); i++)
+            {
+                for (var j = 0; j < array.GetLength(1); j++)
+                {
+                    if (array[i, j].Equals('\0'))
+                    {
+                        array[i, j] = fill;
+                    }
+                }
+            }
+            return array;
+        }
 
         public int GetWidth()
         {
@@ -57,7 +63,7 @@ namespace lambda_cs.Renderer
             return plane[x, y];
         }
 
-        private void Embedd(AsciiPlane subplane, PlaneAlignment alignment)
+        internal void Embedd(AsciiPlane subplane, PlaneAlignment alignment)
         {
             var (x, y) = CalculateInset(subplane.GetWidth(), subplane.GetHeight(), alignment);
             if (x >= 0 && y >= 0)
